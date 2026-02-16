@@ -1,0 +1,41 @@
+Firefly III repository context for AI coding assistants.
+
+Project:
+- Name: Firefly III
+- Type: Laravel application for personal finance management
+- Primary language: PHP
+- Runtime baseline: PHP 8.4+
+
+Code layout:
+- app/: core application code (controllers, services, models, API, jobs, events)
+- app/Support/: shared and reusable backend utilities
+- config/: Laravel configuration
+- database/: migrations, factories, seeders
+- routes/: route definitions
+- resources/: frontend assets and views
+- tests/: unit and integration tests
+
+Package tooling:
+- composer.json: backend dependencies and test scripts
+- package.json: frontend workspace and postinstall patching
+
+Operational guardrails:
+- Prefer small focused classes; avoid god objects
+- Reuse shared logic from existing shared layers (not copy-paste)
+- Keep API responses consistent and return correct HTTP status codes
+- Handle errors gracefully and explicitly
+
+Execution flow for tasks:
+1) Read AGENTS.md + agents.md
+2) Update or create PLAN*.md for the task
+3) Implement plan items top to bottom
+4) Run relevant verification commands
+5) Keep completed items as "awaiting confirmation" until user confirms
+
+Useful commands:
+- composer unit-test
+- composer integration-test
+- composer coverage
+
+Notes:
+- This file is intentionally concise and should be updated when project structure or mandatory workflows change.

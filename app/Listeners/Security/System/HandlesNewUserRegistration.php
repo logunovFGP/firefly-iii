@@ -39,6 +39,7 @@ use FireflyIII\Repositories\User\UserRepositoryInterface;
 use FireflyIII\Support\Facades\FireflyConfig;
 use FireflyIII\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
 class HandlesNewUserRegistration implements ShouldQueue
@@ -78,25 +79,27 @@ class HandlesNewUserRegistration implements ShouldQueue
      */
     private function createGroupMembership(User $user): void
     {
-        $groupExists         = true;
-        $groupTitle          = $user->email;
-        $index               = 1;
+        $groupCounter        = 0;
 
         /** @var null|UserGroup $group */
         $group               = null;
+        $groupTitle          = '';
 
         // create a new group.
-        while ($groupExists) { // @phpstan-ignore-line
-            $groupExists = UserGroup::where('title', $groupTitle)->count() > 0;
-            if (false === $groupExists) {
-                $group = UserGroup::create(['title' => $groupTitle]);
-
-                break;
-            }
-            $groupTitle  = sprintf('%s-%d', $user->email, $index);
-            ++$index;
-            if ($index > 99) {
+        while (null === $group) { // @phpstan-ignore-line
+            if ($groupCounter > 99) {
                 throw new FireflyException('Email address can no longer be used for registrations.');
+            }
+            $groupTitle = 0 === $groupCounter ? $user->email : sprintf('%s-%d', $user->email, $groupCounter);
+            ++$groupCounter;
+
+            try {
+                $group = UserGroup::firstOrCreate(['title' => $groupTitle], ['title' => $groupTitle]);
+            } catch (QueryException $exception) {
+                if (!$this->isDuplicateGroupTitle($exception)) {
+                    throw $exception;
+                }
+                $group = UserGroup::where('title', $groupTitle)->first();
             }
         }
 
@@ -108,6 +111,16 @@ class HandlesNewUserRegistration implements ShouldQueue
         GroupMembership::create(['user_id'       => $user->id, 'user_group_id' => $group->id, 'user_role_id'  => $role->id]);
         $user->user_group_id = $group->id;
         $user->save();
+    }
+
+    private function isDuplicateGroupTitle(QueryException $exception): bool
+    {
+        $errorCode = (int) ($exception->errorInfo[1] ?? 0);
+        if (1062 !== $errorCode) {
+            return false;
+        }
+
+        return false !== str_contains($exception->getMessage(), 'user_groups_title_unique');
     }
 
     private function sendAdminRegistrationNotification(User $user, OwnerNotifiable $owner): void

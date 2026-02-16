@@ -36,6 +36,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -95,7 +96,18 @@ class RegisterController extends Controller
         }
 
         $this->validator($request->all())->validate();
-        $user              = $this->createUser($request->all());
+        $email             = (string) $request->get('email');
+        if (User::where('email', $email)->exists()) {
+            throw ValidationException::withMessages(['email' => (string) trans('validation.unique', ['attribute' => 'email'])]);
+        }
+        try {
+            $user = $this->createUser($request->all());
+        } catch (QueryException $exception) {
+            if (!$this->isDuplicateEmail($exception)) {
+                throw $exception;
+            }
+            throw ValidationException::withMessages(['email' => (string) trans('validation.unique', ['attribute' => 'email'])]);
+        }
         Log::info(sprintf('Registered new user %s', $user->email));
         $owner             = new OwnerNotifiable();
         event(new NewUserRegistered($owner, $user));
@@ -111,6 +123,17 @@ class RegisterController extends Controller
         }
 
         return redirect($this->redirectPath());
+    }
+
+    private function isDuplicateEmail(QueryException $exception): bool
+    {
+        $message   = (string) $exception->getMessage();
+        $errorCode = (int) ($exception->errorInfo[1] ?? 0);
+        if (1062 !== $errorCode) {
+            return false;
+        }
+
+        return false !== str_contains($message, 'users_email_unique');
     }
 
     /**

@@ -1,0 +1,28 @@
+Jira-oriented execution context for AI coding assistants working on Firefly III.
+
+Scope:
+- Use this file when implementing or reviewing work linked to Jira issues.
+- Keep issue implementation aligned with repository plan-driven workflow.
+
+Delivery behavior:
+- Translate Jira acceptance criteria into explicit PLAN checklist items.
+- Implement items sequentially and keep status traceable in the PLAN file.
+- For non-trivial technical choices, add a short "Decision Log" entry in the plan.
+- If blocked by missing external data, record an `ACTUAL_DATA` note in the plan.
+
+Quality rules:
+- Preserve API contract stability unless change is explicitly required.
+- Ensure backend/frontend error handling remains graceful.
+- Return correct REST status codes for create/read/update/delete error paths.
+- Reuse existing shared structures instead of duplicating logic.
+
+Verification:
+- Run existing project verification commands relevant to the touched scope.
+- Record what was run and the outcome in the active PLAN file.
+
+Completion and archival:
+- Do not mark checklist entries complete until user confirms.
+- While waiting for confirmation, keep entry unchecked and annotate:
+  - Status: implemented, awaiting user confirmation
+  - touched files
+- After full confirmation, archive completed plan section under `plans/archive/`.

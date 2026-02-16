@@ -1,0 +1,60 @@
+services:
+  app:
+    volumes:
+      # Bind-mount local source so container reflects local code changes immediately.
+      - ./:/var/www/html
+      # Keep PHP dependencies on a Docker volume to avoid slow/stuck 9p I/O on Windows bind mounts.
+      - firefly_iii_core_vendor:/var/www/html/vendor
+      # Re-apply upload volume after bind-mount to preserve uploaded files.
+      - firefly_iii_upload:/var/www/html/storage/upload
+
+  importer:
+    image: fireflyiii/data-importer:latest
+    container_name: firefly_iii_importer
+    restart: always
+    env_file:
+      - .importer.env
+    networks:
+      - firefly_iii
+    depends_on:
+      - app
+    ports:
+      - 9998:8080
+    volumes:
+      # Mount local importer sources for local development.
+      - ../data-importer:/var/www/html
+      # Keep uploads and vendor dependencies isolated from host filesystem churn.
+      - firefly_iii_importer_upload:/var/www/html/storage/upload
+      - firefly_iii_importer_vendor:/var/www/html/vendor
+
+  categorizer:
+    build:
+      context: ../firefly-iii-ai-categorize
+      dockerfile: Dockerfile
+    container_name: firefly_iii_categorizer
+    restart: always
+    environment:
+      FIREFLY_URL: http://app:8080
+      FIREFLY_PERSONAL_TOKEN: ${CATEGORIZER_FIREFLY_PERSONAL_TOKEN:-}
+      OPENAI_API_KEY: ${CATEGORIZER_OPENAI_API_KEY:-}
+      ENABLE_UI: ${CATEGORIZER_ENABLE_UI:-true}
+      FIREFLY_TAG: ${CATEGORIZER_FIREFLY_TAG:-AI categorized}
+      PORT: 3000
+    command: sh -c "npm install --production && node index.js"
+    working_dir: /app
+    networks:
+      - firefly_iii
+    depends_on:
+      - app
+    ports:
+      - 9997:3000
+    volumes:
+      # Mount local categorizer sources for local development.
+      - ../firefly-iii-ai-categorize:/app
+      - firefly_iii_categorizer_node_modules:/app/node_modules
+
+volumes:
+  firefly_iii_core_vendor:
+  firefly_iii_importer_upload:
+  firefly_iii_importer_vendor:
+  firefly_iii_categorizer_node_modules:
