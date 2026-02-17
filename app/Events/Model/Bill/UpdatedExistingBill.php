@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * api-noauth.php
- * Copyright (c) 2021 james@firefly-iii.org
+ * UpdatedExistingBill.php
+ * Copyright (c) 2026 james@firefly-iii.org
  *
  * This file is part of Firefly III (https://github.com/firefly-iii).
  *
@@ -20,20 +22,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
+namespace FireflyIII\Events\Model\Bill;
 
-use Illuminate\Support\Facades\Route;
-// Cron job API routes:
-use FireflyIII\Http\Middleware\AcceptHeaders;
+use FireflyIII\Events\Event;
+use FireflyIII\Models\Bill;
+use Illuminate\Queue\SerializesModels;
 
-Route::group(
-    [
-        'namespace'  => 'FireflyIII\Api\V1\Controllers\System',
-        'prefix'     => '',
-        'as'         => 'api.v1.cron.',
-        'middleware' => [AcceptHeaders::class],
-    ],
-    static function (): void {
-        Route::get('{cliToken}', ['uses' => 'CronController@cron', 'as' => 'index']);
-    }
-);
+class UpdatedExistingBill extends Event
+{
+    use SerializesModels;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Bill $bill,
+        public array $oldData
+    ) {}
+}

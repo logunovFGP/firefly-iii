@@ -34,9 +34,6 @@
         "transfers",
         "management"
     ],
-    "platform": {
-        "php": "8.4"
-    },
     "license": "AGPL-3.0-or-later",
     "homepage": "https://github.com/firefly-iii/firefly-iii",
     "type": "project",
@@ -93,13 +90,12 @@
         "laravel-notification-channels/pushover": "^4.0",
         "laravel/framework": "^12",
         "laravel/passport": "^12.0",
-        "laravel/sanctum": "^4.1",
         "laravel/slack-notification-channel": "^3.3",
         "laravel/ui": "^4.2",
         "league/commonmark": "^2",
         "league/csv": "^9.10",
         "league/fractal": "0.*",
-        "mailersend/laravel-driver": "^2.12",
+        "mailersend/laravel-driver": "^3.0",
         "nunomaduro/collision": "^8",
         "pragmarx/google2fa": "^8.0",
         "predis/predis": "^3",

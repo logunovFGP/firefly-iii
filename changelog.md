@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v6.4.22
+
+This release and several previous ones fix authentication problems mainly. Cleaning up the libraries that make up Firefly III's excellent security (with me standing on the shoulders of giants) means that many edge cases that worked in the past no longer worked. Notable issues are listed below. 
+
+As far as I know it all works as it should, but feel free to open new issues when necessary. My apologies for the mess.
+
+## Fixed
+
+- Removed Laravel Sanctum as it was unused.
+- Migrated away from Laravel 10's kernel and bootstrap structure.
+- Fixed remote user guard for console and unauthenticated routes (like `/up` and `health`)
+- [Issue 11710](https://github.com/firefly-iii/firefly-iii/issues/11710) (Firefly throws error on startup and when trying to use importer) reported by @avee87
+- [Issue 11712](https://github.com/firefly-iii/firefly-iii/issues/11712) (`RemoteUserGuard` regression in v6.4.19 blocks `/health` endpoint and internal Artisan commands) reported by @Dual-0
+- [Issue 11720](https://github.com/firefly-iii/firefly-iii/issues/11720) (`RemoteUserGuard` regression from v6.4.19 (including v6.4.21) blocks `/health` endpoint) reported by @rjhenry
+
+## v6.4.21
+
+### Added
+- The ability to undo the recording of a database migration, which may help with database issues. [See the docs](https://docs.firefly-iii.org/references/faq/firefly-iii/using/#i-get-errors-about-missing-tables-how-do-i-fix-this)
+- Added debug logs to file permission checks.
+
+### Fixed
+- View range issue for subscription overview
+- Amount log entries were recorded for the transaction group, not the journal
+- Subscriptions were not being renamed in rules when their names were changed
+- [Issue 11688](https://github.com/firefly-iii/firefly-iii/issues/11688) (Token endpoints returning 401 unauthorized) reported by @molnarti
+- [Issue 11694](https://github.com/firefly-iii/firefly-iii/issues/11694) (Foreign currency amount is always positive in transfers) reported by @SledgehammerPL
+- [Issue 11684](https://github.com/firefly-iii/firefly-iii/issues/11684) (Transaction summary duplicated after more than 10 rows) reported by @jkmf
+- [Issue 11700](https://github.com/firefly-iii/firefly-iii/issues/11700) (Duplicate entry for key 'tag_transaction_journal_tag_id_transaction_journal_id_unique') reported by @beatbesmer
+- [Issue 11702](https://github.com/firefly-iii/firefly-iii/issues/11702) (Can't enable displaying primary currency when using Postgres) reported by @absdjfh
+- [Issue 11710](https://github.com/firefly-iii/firefly-iii/issues/11710) (Firefly throws error on startup and when trying to use importer) reported by @avee87
+
+## v6.4.20
+
+### Added
+- The ability to undo the recording of a database migration, which may help with database issues. [See the docs](https://docs.firefly-iii.org/references/faq/firefly-iii/using/#i-get-errors-about-missing-tables-how-do-i-fix-this)
+- Added debug logs to file permission checks.
+
+### Fixed
+- View range issue for subscription overview
+- Amount log entries were recorded for the transaction group, not the journal
+- Subscriptions were not being renamed in rules when their names were changed
+- [Issue 11688](https://github.com/firefly-iii/firefly-iii/issues/11688) (Token endpoints returning 401 unauthorized) reported by @molnarti
+- [Issue 11694](https://github.com/firefly-iii/firefly-iii/issues/11694) (Foreign currency amount is always positive in transfers) reported by @SledgehammerPL
+- [Issue 11684](https://github.com/firefly-iii/firefly-iii/issues/11684) (Transaction summary duplicated after more than 10 rows) reported by @jkmf
+- [Issue 11700](https://github.com/firefly-iii/firefly-iii/issues/11700) (Duplicate entry for key 'tag_transaction_journal_tag_id_transaction_journal_id_unique') reported by @beatbesmer
+- [Issue 11702](https://github.com/firefly-iii/firefly-iii/issues/11702) (Can't enable displaying primary currency when using Postgres) reported by @absdjfh
+
+## v6.4.19
+
+### Added
+- The ability to undo the recording of a database migration, which may help with database issues. [See the docs](https://docs.firefly-iii.org/references/faq/firefly-iii/using/#i-get-errors-about-missing-tables-how-do-i-fix-this)
+- Added debug logs to file permission checks
+
+### Fixed
+- View range issue for subscription overview
+- Amount log entries were recorded for the transaction group, not the journal
+- Subscriptions were not being renamed in rules when their names were changed
+- [Issue 11688](https://github.com/firefly-iii/firefly-iii/issues/11688) (Token endpoints returning 401 unauthorized) reported by @molnarti
+- [Issue 11694](https://github.com/firefly-iii/firefly-iii/issues/11694) (Foreign currency amount is always positive in transfers) reported by @SledgehammerPL
+- [Issue 11684](https://github.com/firefly-iii/firefly-iii/issues/11684) (Transaction summary duplicated after more than 10 rows) reported by @jkmf
+- [Issue 11700](https://github.com/firefly-iii/firefly-iii/issues/11700) (Duplicate entry for key 'tag_transaction_journal_tag_id_transaction_journal_id_unique') reported by @beatbesmer
+- [Issue 11702](https://github.com/firefly-iii/firefly-iii/issues/11702) (Can't enable displaying primary currency when using Postgres) reported by @absdjfh
+
 ## v6.4.18
 
 ### Fixed
