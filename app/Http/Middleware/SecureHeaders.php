@@ -89,7 +89,8 @@ class SecureHeaders
             $customUrl = $logoutUrl;
         }
 
-        if (null !== $route && 'oauth/authorize' !== $route->uri) {
+        $skipFormAction     = ['oauth/authorize', 'login'];
+        if (null !== $route && !in_array($route->uri, $skipFormAction, true)) {
             $csp[] = sprintf("form-action 'self' %s", $customUrl);
         }
 
