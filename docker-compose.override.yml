@@ -7,6 +7,8 @@ services:
       - firefly_iii_core_vendor:/var/www/html/vendor
       # Re-apply upload volume after bind-mount to preserve uploaded files.
       - firefly_iii_upload:/var/www/html/storage/upload
+      # Bootstrap cache needs a Docker volume because chmod() fails on WSL2/NTFS bind mounts.
+      - firefly_iii_core_bootstrap_cache:/var/www/html/bootstrap/cache
 
   importer:
     image: fireflyiii/data-importer:latest
@@ -26,6 +28,8 @@ services:
       # Keep uploads and vendor dependencies isolated from host filesystem churn.
       - firefly_iii_importer_upload:/var/www/html/storage/upload
       - firefly_iii_importer_vendor:/var/www/html/vendor
+      # Bootstrap cache needs a Docker volume because chmod() fails on WSL2/NTFS bind mounts.
+      - firefly_iii_importer_bootstrap_cache:/var/www/html/bootstrap/cache
 
   categorizer:
     build:
@@ -54,7 +58,9 @@ services:
       - firefly_iii_categorizer_node_modules:/app/node_modules
 
 volumes:
+  firefly_iii_core_bootstrap_cache:
   firefly_iii_core_vendor:
   firefly_iii_importer_upload:
   firefly_iii_importer_vendor:
+  firefly_iii_importer_bootstrap_cache:
   firefly_iii_categorizer_node_modules:
