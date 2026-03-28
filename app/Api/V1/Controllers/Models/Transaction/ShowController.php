@@ -78,6 +78,10 @@ class ShowController extends Controller
             // set types of transactions to return.
             ->setTypes($types)
         ;
+        if ($request->boolean('without_category')) {
+            $collector->withoutCategory();
+            $this->parameters->set('without_category', true);
+        }
         if (null !== $this->parameters->get('start') || null !== $this->parameters->get('end')) {
             $collector->setRange($this->parameters->get('start'), $this->parameters->get('end'));
         }

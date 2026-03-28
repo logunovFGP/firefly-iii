@@ -41,6 +41,11 @@ services:
       FIREFLY_URL: http://app:8080
       FIREFLY_PERSONAL_TOKEN: ${CATEGORIZER_FIREFLY_PERSONAL_TOKEN:-}
       OPENAI_API_KEY: ${CATEGORIZER_OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${CATEGORIZER_GEMINI_API_KEY:-}
+      CATEGORIZER_MASTER_KEY: ${CATEGORIZER_MASTER_KEY:-}
+      CATEGORIZER_API_TOKEN: ${CATEGORIZER_API_TOKEN:-}
+      ACTIVE_PROVIDER: ${CATEGORIZER_ACTIVE_PROVIDER:-openai}
+      ACTIVE_MODEL: ${CATEGORIZER_ACTIVE_MODEL:-gpt-4o-mini}
       ENABLE_UI: ${CATEGORIZER_ENABLE_UI:-true}
       FIREFLY_TAG: ${CATEGORIZER_FIREFLY_TAG:-AI categorized}
       PORT: 3000
@@ -56,6 +61,7 @@ services:
       # Mount local categorizer sources for local development.
       - ../firefly-iii-ai-categorize:/app
       - firefly_iii_categorizer_node_modules:/app/node_modules
+      - firefly_iii_categorizer_storage:/app/storage
 
 volumes:
   firefly_iii_core_bootstrap_cache:
@@ -64,3 +70,4 @@ volumes:
   firefly_iii_importer_vendor:
   firefly_iii_importer_bootstrap_cache:
   firefly_iii_categorizer_node_modules:
+  firefly_iii_categorizer_storage:
