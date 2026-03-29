@@ -107,7 +107,7 @@ class StoreRequest extends FormRequest
             'virtual_balance'      => 'numeric|nullable',
             'order'                => 'numeric|nullable',
             'currency_id'          => 'numeric|exists:transaction_currencies,id',
-            'currency_code'        => 'min:3|max:3|exists:transaction_currencies,code',
+            'currency_code'        => 'min:3|max:12|exists:transaction_currencies,code',
             'active'               => [new IsBoolean()],
             'include_net_worth'    => [new IsBoolean()],
             'account_role'         => sprintf('nullable|in:%s|required_if:type,asset', $accountRoles),
