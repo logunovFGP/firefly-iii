@@ -10,7 +10,7 @@ use FireflyIII\Enums\UserRoleEnum;
 use FireflyIII\Events\Model\TransactionGroup\TransactionGroupEventFlags;
 use FireflyIII\Events\Model\TransactionGroup\TransactionGroupEventObjects;
 use FireflyIII\Events\Model\TransactionGroup\UpdatedSingleTransactionGroup;
-use FireflyIII\Services\Internal\Update\JournalUpdateService;
+use FireflyIII\Repositories\Journal\JournalRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Log;
 
 class BulkCategorizeController extends Controller
 {
+    private JournalRepositoryInterface $repository;
+
     protected array $acceptedRoles = [UserRoleEnum::MANAGE_TRANSACTIONS];
 
     public function __construct()
@@ -25,6 +27,9 @@ class BulkCategorizeController extends Controller
         parent::__construct();
         $this->middleware(function (Request $request, $next) {
             $this->validateUserGroup($request);
+            $this->repository = app(JournalRepositoryInterface::class);
+            $this->repository->setUserGroup($this->userGroup);
+            $this->repository->setUser($this->user);
 
             return $next($request);
         });
@@ -76,7 +81,9 @@ class BulkCategorizeController extends Controller
 
         // Fire a single batch event for all successfully updated groups
         if ($applied > 0) {
-            $flags = new TransactionGroupEventFlags();
+            $flags                = new TransactionGroupEventFlags();
+            $flags->fireWebhooks  = false; // Bulk automation — do not trigger 500 outbound webhook messages
+            $flags->applyRules    = false; // Transactions are already categorized — no need to re-run rules
             event(new UpdatedSingleTransactionGroup($flags, $objects));
         }
 
@@ -101,21 +108,15 @@ class BulkCategorizeController extends Controller
         }
 
         foreach ($group->transactionJournals as $journal) {
-            // Build combined data for single JournalUpdateService call
-            $data = ['category_name' => $item['category_name']];
+            // Use lightweight repository methods instead of full JournalUpdateService
+            $this->repository->updateCategory($journal, $item['category_name']);
 
             // Tag append: fetch existing, merge, deduplicate
             if (null !== $item['tag'] && '' !== $item['tag']) {
                 $existingTags = $journal->tags->pluck('tag')->toArray();
-                $data['tags'] = array_values(array_unique(array_merge($existingTags, [$item['tag']])));
+                $mergedTags   = array_values(array_unique(array_merge($existingTags, [$item['tag']])));
+                $this->repository->updateTags($journal, $mergedTags);
             }
-
-            /** @var JournalUpdateService $service */
-            $service = app(JournalUpdateService::class);
-            $service->setTransactionJournal($journal);
-            $service->setData($data);
-            $service->update();
-            $journal->refresh();
         }
 
         $objects->appendFromTransactionGroup($group);
