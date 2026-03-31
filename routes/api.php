@@ -214,6 +214,7 @@ Route::group(
     ],
     static function (): void {
         Route::post('transactions', ['uses' => 'TransactionController@update', 'as' => 'transactions']);
+        Route::post('categorize', ['uses' => 'BulkCategorizeController@categorize', 'as' => 'categorize']);
     }
 );
 
