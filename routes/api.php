@@ -604,6 +604,8 @@ Route::group(
     static function (): void {
         Route::get('', ['uses' => 'ShowController@index', 'as' => 'index']);
         Route::post('', ['uses' => 'StoreController@store', 'as' => 'store']);
+        Route::post('batch', ['uses' => 'BatchStoreController@store', 'as' => 'batch-store'])
+            ->middleware('throttle:10,1');
         Route::get('{transactionGroup}', ['uses' => 'ShowController@show', 'as' => 'show']);
         Route::put('{transactionGroup}', ['uses' => 'UpdateController@update', 'as' => 'update']);
         Route::delete('{transactionGroup}', ['uses' => 'DestroyController@destroy', 'as' => 'delete']);
@@ -701,6 +703,7 @@ Route::group(
     static function (): void {
         Route::get('transactions', ['uses' => 'TransactionController@search', 'as' => 'transactions']);
         Route::get('accounts', ['uses' => 'AccountController@search', 'as' => 'accounts']);
+        Route::post('external-ids', ['uses' => 'ExternalIdController@search', 'as' => 'external-ids']);
     }
 );
 
@@ -757,6 +760,20 @@ Route::group(
     ],
     static function (): void {
         Route::post('finish', ['uses' => 'BatchController@finishBatch', 'as' => 'finish']);
+    }
+);
+
+// Import Source API routes:
+Route::group(
+    [
+        'middleware' => ['auth:api,sanctum', 'bindings'],
+        'namespace'  => 'FireflyIII\Api\V1\Controllers\System',
+        'prefix'     => 'v1',
+        'as'         => 'api.v1.import-sources.',
+    ],
+    static function (): void {
+        Route::post('import-sources', ['uses' => 'ImportSourceController@findOrCreate', 'as' => 'find-or-create']);
+        Route::get('import-sources', ['uses' => 'ImportSourceController@index', 'as' => 'index']);
     }
 );
 

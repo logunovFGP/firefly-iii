@@ -70,6 +70,7 @@ class TransactionJournal extends Model
         'order',
         'date',
         'date_tz',
+        'import_source_id',
     ];
 
     protected $hidden   = ['encrypted'];
@@ -143,6 +144,11 @@ class TransactionJournal extends Model
     public function destJournalLinks(): HasMany
     {
         return $this->hasMany(TransactionJournalLink::class, 'destination_id');
+    }
+
+    public function importSource(): BelongsTo
+    {
+        return $this->belongsTo(ImportSource::class, 'import_source_id');
     }
 
     public function isTransfer(): bool
@@ -242,7 +248,8 @@ class TransactionJournal extends Model
             'encrypted'     => 'boolean',
             'completed'     => 'boolean',
             'user_id'       => 'integer',
-            'user_group_id' => 'integer',
+            'user_group_id'    => 'integer',
+            'import_source_id' => 'integer',
         ];
     }
 

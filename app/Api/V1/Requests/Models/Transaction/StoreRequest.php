@@ -145,6 +145,7 @@ class StoreRequest extends FormRequest
             // meta info fields
             'transactions.*.internal_reference'    => 'min:1|max:255|nullable',
             'transactions.*.external_id'           => 'min:1|max:255|nullable',
+            'transactions.*.import_source'         => 'nullable|string|min:1|max:64',
             'transactions.*.recurrence_id'         => 'min:1|max:255|nullable',
             'transactions.*.bunq_payment_id'       => 'min:1|max:255|nullable',
             'transactions.*.external_url'          => sprintf('min:1|max:255|nullable|url:%s', $validProtocols),
@@ -280,6 +281,7 @@ class StoreRequest extends FormRequest
                 // all custom fields:
                 'internal_reference'    => $this->clearString((string) $object['internal_reference']),
                 'external_id'           => $this->clearString((string) $object['external_id']),
+                'import_source'         => $this->clearString((string) ($object['import_source'] ?? '')),
                 'original_source'       => sprintf('ff3-v%s', config('firefly.version')),
                 'recurrence_id'         => $this->integerFromValue($object['recurrence_id']),
                 'bunq_payment_id'       => $this->clearString((string) $object['bunq_payment_id']),

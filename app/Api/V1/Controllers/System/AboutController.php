@@ -51,11 +51,16 @@ class AboutController extends Controller
         $phpOs         = str_replace($search, $replace, PHP_OS);
         $currentDriver = DB::getDriverName();
         $data          = [
-            'version'     => config('firefly.version'),
-            'api_version' => config('firefly.version'),
-            'php_version' => $phpVersion,
-            'os'          => $phpOs,
-            'driver'      => $currentDriver,
+            'version'      => config('firefly.version'),
+            'api_version'  => config('firefly.version'),
+            'php_version'  => $phpVersion,
+            'os'           => $phpOs,
+            'driver'       => $currentDriver,
+            'capabilities' => [
+                'batch_transactions'       => true,
+                'batch_external_id_search' => true,
+                'import_sources'           => true,
+            ],
         ];
 
         return response()->api(['data' => $data])->header('Content-Type', self::JSON_CONTENT_TYPE);

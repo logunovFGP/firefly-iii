@@ -32,6 +32,7 @@ use FireflyIII\Exceptions\DuplicateTransactionException;
 use FireflyIII\Exceptions\FireflyException;
 use FireflyIII\Models\Account;
 use FireflyIII\Models\Bill;
+use FireflyIII\Models\ImportSource;
 use FireflyIII\Models\Location;
 use FireflyIII\Models\PiggyBank;
 use FireflyIII\Models\Transaction;
@@ -317,6 +318,14 @@ class TransactionJournalFactory
         $foreignCurrency       = $this->getForeignByAccount($type->type, $foreignCurrency, $destinationAccount);
         $description           = $this->getDescription($description);
 
+        // Resolve import source if provided.
+        $importSourceId        = null;
+        $importSourceName      = trim((string) ($row['import_source'] ?? ''));
+        if ('' !== $importSourceName) {
+            $importSource   = ImportSource::findOrCreateByName($this->userGroup->id, $importSourceName);
+            $importSourceId = $importSource->id;
+        }
+
         Log::debug(sprintf(
             'Currency is #%d "%s", foreign currency is #%d "%s"',
             $currency->id,
@@ -339,6 +348,7 @@ class TransactionJournalFactory
             'order'                   => $order,
             'tag_count'               => 0,
             'completed'               => !$row['batch_submission'],
+            'import_source_id'        => $importSourceId,
         ]);
         Log::debug(sprintf('Created new journal #%d: "%s"', $journal->id, $journal->description));
 
